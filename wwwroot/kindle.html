@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kindle Dashboard</title>
+
+  <style>
+    :root {
+      --bg: #fff;
+      --fg: #000;
+      --gap: 12px;
+      --radius: 8px;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      color: #000;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* MAIN ROTATOR (ONLY HERE) */
+    #rotator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vh;
+      height: 100vw;
+      transform-origin: 0 0;
+      transform: rotate(-90deg) translate(-100%,0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* DASHBOARD */
+    .dashboard {
+      width: 740px;
+      height: 580px;
+      padding: 14px;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      display: grid;
+      grid-template-columns: 30% 70%;
+      grid-template-rows: auto 1fr auto;
+      gap: var(--gap);
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      grid-column: 1/-1;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 6px;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .top-info {
+      font-size: 0.9rem;
+      border: 1px solid gray;
+      padding-left: 4px;
+      padding-right: 4px;
+      color: #444;
+    }
+
+    /* LEFT PANEL */
+    .left-pane {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    .clock-box {
+      padding: 16px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+      .clock-box.am {
+        background: #fff;
+        color: #000;
+      }
+
+      .clock-box.pm {
+        background: #000;
+        color: #fff;
+      }
+
+    #clock {
+      font-size: 3.8rem;
+      font-weight: 600;
+    }
+
+    #dateText {
+      margin-top: 12px;
+      font-size: 1.1rem;
+    }
+
+    /* CALENDAR */
+    .cal-box {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+      .cal-box table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+        font-size: 0.8rem;
+      }
+
+      .cal-box th {
+        color: #444;
+      }
+
+      .cal-box td {
+        padding: 3px;
+        border-radius: 4px;
+      }
+
+    .today {
+      background: #000;
+      color: #fff;
+    }
+
+    /* RIGHT SIDE */
+    .right-pane {
+      display: flex;
+      padding-top: 4px;
+    }
+
+    .sml-btn {
+      width: 100%;
+      /*height: 75px;*/
+      border: 1px solid #000;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 2rem;
+      margin: 5px;
+    }
+
+    .bright-btn {
+      width: 100%;
+      height: 100px;
+      border: 1px solid #000;
+      border-radius: 8px;
+      margin: 2px;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column; /* icon on top, text below */
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+      .bright-btn img {
+        width: 32px;
+        height: 32px;
+        filter: invert(0); /* black */
+        transition: filter 0.2s;
+      }
+
+    /* Active state */
+      .bright-btn.active {
+        background: black;
+        border-color: black;
+        color:white;
+      }
+
+        .bright-btn.active img {
+          filter: invert(1); /* white */
+        }
+        .bright-btn.active span {
+          color:white;
+        }
+
+    .btn-text {
+      font-size: 14px;
+      color: black;
+    }
+
+    .toggle-btn.active .btn-text {
+      color: white; /* invert text color too */
+    }
+
+    .bright-value {
+      font-size: 1.2rem;
+    }
+
+   
+    /* POPUP OVERLAY — NO ROTATION HERE! */
+    #popup-bg {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background: rgba(0,0,0,0.45);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      /* Centering fix for rotated popup */
+      transform-origin: center center;
+      transform: rotate(-90deg) translate(-50%, 0);
+    }
+
+    .popup {
+      background: #fff;
+      border: 1px solid #000;
+      border-radius: 8px;
+      padding: 16px;
+      width: 280px;
+      text-align: center;
+    }
+
+    .popup-row {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .popup-btn {
+      border: 1px solid #000;
+      padding: 6px 10px;
+      background: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      height:50px;
+      width:50px;
+    }
+
+    #brightnessSlider {
+      width: 100px;
+    }
+
+    .set-btn {
+      margin-top: 16px;
+      padding: 8px 20px;
+      background: #000;
+      color: #fff;
+      border: 1px solid #000;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* BOTTOM BAR */
+    .footer-bar {
+      grid-column: 1/-1;
+      font-size: 0.8rem;
+      color: #444;
+      border-top: 1px solid #eee;
+      padding-top: 6px;
+      text-align: right;
+      height: 15px;
+    }
+
+    /* icon sizing and color helpers */
+    .icon {
+      display: inline-block;
+      width: 22px; /* change size by overriding width/height */
+      height: 22px;
+      vertical-align: middle;
+      color: #000; /* icons use currentColor */
+      fill: currentColor;
+      stroke: currentColor;
+    }
+
+    /* larger / smaller */
+    .icon-lg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .icon-sm {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* invert for dark backgrounds */
+    .icon-invert {
+      color: #fff;
+    }
+
+    .top-right {
+      display: flex;
+      gap: 10px; /* keeps them close */
+      align-items: center;
+    }
+
+    .gold-box {
+      border: 1px solid #000;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1rem;
+      margin-top: 12px;
+    }
+
+    table.unstyledTable {
+      /*border: 1px solid #000000;*/
+      width: 100%;
+    }
+
+      table.unstyledTable td, table.unstyledTable th {
+        border: 1px solid #AAAAAA;
+      }
+
+        table.unstyledTable td:nth-child(even) {
+          background: #D0E4F5;
+        }
+
+      table.unstyledTable thead {
+        background: #DDDDDD;
+      }
+
+        table.unstyledTable thead th {
+          font-size: 15px;
+          font-weight: bold;
+        }
+
+    #fullRefreshOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      z-index: 999999;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <!-- KINDLE ICON SPRITE (place once in the page) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+    <!-- WIFI: 3 bars -->
+    <symbol id="ico-wifi-3" viewBox="0 0 24 24">
+      <path d="M2 8c6-7 14-7 20 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M6 12c4-5 8-5 12 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="12" cy="18" r="1.6" fill="currentColor" />
+    </symbol>
+
+
+    <symbol id="ico-batt-4" viewBox="0 0 24 24">
+      <rect x="2" y="7" width="18" height="10" rx="2" ry="2" stroke="currentColor" stroke-width="1.6" fill="none" />
+      <rect x="20" y="10" width="2" height="4" fill="currentColor" />
+      <rect x="4" y="9" width="3" height="6" fill="currentColor" />
+      <rect x="8.5" y="9" width="3" height="6" fill="currentColor" />
+      <rect x="13" y="9" width="3" height="6" fill="currentColor" />
+      <rect x="17.5" y="9" width="3" height="6" fill="currentColor" />
+    </symbol>
+
+    <!-- BRIGHTNESS / SUN -->
+    <symbol id="ico-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" fill="none" />
+      <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+        <line x1="12" y1="1.8" x2="12" y2="4.5" />
+        <line x1="12" y1="19.5" x2="12" y2="22.2" />
+        <line x1="1.8" y1="12" x2="4.5" y2="12" />
+        <line x1="19.5" y1="12" x2="22.2" y2="12" />
+        <line x1="4" y1="4" x2="5.8" y2="5.8" />
+        <line x1="18.2" y1="18.2" x2="20" y2="20" />
+        <line x1="4" y1="20" x2="5.8" y2="18.2" />
+        <line x1="18.2" y1="5.8" x2="20" y2="4" />
+      </g>
+    </symbol>
+
+
+
+    <div id="rotator">
+
+      <div class="dashboard">
+
+        <!-- TOP BAR -->
+        <!--<header class="top-bar">
+        <div class="title"></div>
+
+        <div class="top-right">
+          <div class="top-info">
+
+          </div>
+
+          <div class="top-info">
+
+          </div>
+        </div>
+      </header>-->
+        <!-- LEFT -->
+        <section class="left-pane">
+          <div id="clockBox" class="clock-box am">
+            <div id="clock">00:00</div>
+            <div id="dateText">Loading...</div>
+          </div>
+
+          <div class="cal-box">
+            <table id="calendar"></table>
+          </div>
+          <div style="display:flex; gap:12px; width:100%">
+            <div class="sml-btn">
+              <svg class="icon"><use href="#ico-batt-4"></use></svg>
+              <span id="batt" style="font-size:16px;">---</span>
+            </div>
+            <div class="sml-btn">
+              <svg class="icon"><use href="#ico-wifi-3"></use></svg>
+              <span id="wifiSsid" style="font-size:10px;">---</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; width:100%">
+            <div class="sml-btn">
+              <div style="font-size:20px;">☀</div>
+              
+            </div>
+
+
+          </div>
+          <div style="display:flex; gap:12px; width:100%">
+            <div class="sml-btn">
+              <div style="font-size:20px;">☀</div>
+            </div>
+
+
+          </div>
+        </section>
+
+        <!-- RIGHT -->
+        <section class="right-pane">
+          <div style="display:flex; flex-direction:column; gap:12px;">
+
+            <!-- FIRST ROW OF BUTTONS -->
+            <div style="display:flex; gap:12px; width:100%">
+              <div id="brightBtn" class="bright-btn">
+                <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAC7gAAAu4Bks13cwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAASxSURBVHic7ZtNaFVHFMd/J+YDHglaqLgQJBFE2mehYLS460KkFltqXZR268qFrsUupIvgSogLwYW4UVDIplKhm+4lpW5SE7ISLLiotimlUHx5SU4XM21f5s28N/feue/e4DtwyLuXmfPxn8/7n4moKlWIiJwE5uzj16r6QyVxVAGAiOwCngEH7KtfgIOqujnoWEYG7dBKk/+Tx/5uVhFIVQD4/FYSS1UA1EaGAFQdQNUyBCC2oIjsF5FGIr/tyHeZRUQaIrI/uoKq9lXgJrAB/A5cjKnTx54Aq4BaXcXuSQravWhj3ABuRtWJMHoI2OoIVoHLCYKdBR5anU1g77IT4xZwKAUA+4B1x3gSEFKpJ3m1Me8rDIB1cMPjoBYgBJJX4EZU/UgnI8CduoHQI/k7wEgyACJAOF5B8seLJp8JgD4gXM+ZRANo5Kx7vWjymQHoAcKpiHp7gK+AB8DPwFpH/TX77j7wBTAVYe9U0eRzAWCdC/A5cM/+Da7hwGFgIbCShPQ1cBeY6RPDORvD2V4xJAcgEqTdwC3MDi82cVdbwDwwWVqcJSV/EFgpkLirS8B0GbEmp8RE5APgEfB2oEgbWAaeWAU4arUJjAXqvQI+UdXFdNGStgcA08BLwq34ITDRo/6ELbMUsPEKwx3WbwgAk4HANzDs73gGW+O2zobH3gqwu44AzHuCfQYcK2DzmLXh2r1VKwCAGcyM7bZ87uQdENye0AYO1wmAu55WmkvYu+Y89hdqAQAwhdm4uBNe9JiP8DHumV/WgT1FbafgBD/GzN6dcklV1xPYBsDauuS8HrO+C0kKAD5zntvA4wR2XXlMN2/4aVGjo/DfWV0TPyBtYEVtX/TIEed5WVVbRQNzRVVbIrIMvN/xOnicJiICvIt/Y7WFiXMT4CTwnN5b0VUCvB3bv+oUuJ1q7Ht83XZ8rQXKzbKddPXpc5s7i30K/qsPPY4annIXSgTggsdfF5+AIVpjclocYXg4wmnM+fwbOQRGVfV7EZkh/yT4Anir4/loJviziWv7ha+Qqv4kIu8QMQmO2gqbmI1GHnnK9pWgKSITqVcCEZmge9Z/GipvG2y5n90U4/9b53kMOJHArisn6G5N13d2STAuq9oKvyaCPO2nhXuAqv6FIT075T3galHbHXLV2uyUBeu7mCRqoUF/DrfowRhnsp+wmw6SEJlPFndCAAZFiS2RkCZPBoANfJpySdGXJKbHy6LFvwP2BorkpcV/A85onWlxpyeEWjGPrpCYDi9lCDggTGImRnd1yKJtzPFaMho8CQCYg8mzmIPJc/Q+HJ3BkKbuZqmXrmP2FkHmF9iFOUm+B5weGADkPx6fsgHfJ3w8/gBzhN6X7AS+dGK4VjoAgeSVai5I+Kj4zCCkSF6p5orMR4FYMoGQIvkqL0ldKwpCrKM6X5MLgXAlCQDsjIuSPhD+JOauUYTxnXJV1gWhRcKbojvlsvQV2/It4JuYOtHfAvYK+h+q+ndUhd62mnTzeUdUtS+HF2F7CrO0/hpTfjTWsKp6Gdic4vvgCX0EZRI1LFE0U/TGH4oMAag6gKplCEBFfrci35Uuw3+eHrRDAJvoeeBHq+erSB7gH8F+2j0aLdzTAAAAAElFTkSuQmCC" />
+                <span id="brightValue" class="btn-text">123</span>
+              </div>
+
+              <div id="btnPrinter" class="bright-btn">
+                <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAHPAAABzwHhDBDHAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAPxQTFRF////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWaLyywAAAFN0Uk5TAAIDBAUIDA0OFxgZGhscHyInLDA0OD0/QEFCQ0ZNUFhZWlxdX2Bib3F6e3+AgYKMkZWYmZ+goaKjpKaorba4uru9wcPMzc7f4ujt8PHy8/b4+f5whYqKAAABNklEQVRYw+3XWU/CQBSG4a+igrhTi+Aui6iAgiJuKLKIgBWL5///Fy/GGCaZsdOOF2LmvZpk2idNm7SnAF+JfCrh5wxggL8BROZ8iuD3i6Vz+VDl0jEAOHIpdG4G2CGdPrbR1gKojVGo895u+2wxQqjzz+Yxk2XLQMDz3ubWBRF1AQCd4MAhgNl3oksAQD448GSvrp0S0YsFAMfBge92ASz0NQDv/ODGIw1gIgMYwAD/Exg6Sg2lwEDtYzrggDEPxG2f4jwwRo8HVAaMSaCHgh5QgFXXAeoWgFS5dsWqMOAhsy8s22RA5evwWjklHrKWZbd/RXFKK0bF81X0ZGoGTa/1KKzlKQKObNNRBDZkm7Yi4DbuhTVep+YpVBPrwhJVIioqAEuyzUXFK7hLil9lyWvz0yUEPgFrF2m6dWTp3wAAAABJRU5ErkJggg==" />
+              </div>
+
+              <div id="btnClose"class="bright-btn">
+                <img alt="" src="data:image/png;base64,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" />
+              </div>
+              <div class="bright-btn" style="color:#bfbfbf">
+                <div style="font-size:40px;">☀</div>
+              </div>
+              <div id="btnReload" class="bright-btn" style="color:#bfbfbf">
+                <img alt="" src="data:image/png;base64,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" />
+              </div>
+
+            </div>
+            <!-- SECOND ROW OF BUTTONS -->
+            <div style="display: flex; gap: 12px; width: 100%">
+              <div id="goldBox" class="gold-box"></div>
+              <div id="goldBox2" class="gold-box"></div>
+            </div>
+            <!-- Third ROW OF BUTTONS -->
+            <div style="display: flex; gap: 12px; width: 100%">
+              <div id="goldBox3" class="gold-box"></div>
+              <div id="goldBox4" class="gold-box"></div>
+            </div>
+        </section>
+        <!-- BOTTOM -->
+        <footer class="footer-bar">
+          MAC: <span id="mac">24:a1:12:bb:9f:22</span> |
+          IP: <span id="ip">125.251.12.11</span> |
+          SS: <span id="screensaver">off</span>
+        </footer>
+
+      </div>
+    </div>
+
+    <!-- POPUP -->
+    <div id="popup-bg">
+      <div class="popup">
+        <h3>Brightness</h3>
+
+        <div class="popup-row">
+          <button id="minus" class="popup-btn">−</button>
+          <input type="range" id="brightnessSlider" min="0" max="10">
+          <button id="plus" class="popup-btn">+</button>
+        </div>
+
+        <div class="popup-row">
+          <input id="brightnessText" type="text" style="width:50px;text-align:center;">
+        </div>
+
+        <button id="offBtn" class="set-btn" style="background:#444;margin-right:10px;">Off</button>
+        <button id="setBtn" class="set-btn">Set</button>
+      </div>
+    </div>
+    <div id="fullRefreshOverlay"></div>
+
+    <script>
+      /* CLOCK */
+      function updateClock() {
+        const now = new Date();
+        let h = now.getHours();
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const ampm = h >= 12 ? "PM" : "AM";
+        h = h % 12 || 12;
+
+        document.getElementById("clock").textContent = h + ":" + m;
+        document.getElementById("dateText").textContent =
+          now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+
+        const cb = document.getElementById("clockBox");
+        cb.classList.toggle("pm", ampm === "PM");
+        cb.classList.toggle("am", ampm === "AM");
+      }
+      updateClock();
+      setInterval(updateClock, 60000);
+
+      /* CALENDAR */
+      function renderCalendar() {
+        const now = new Date();
+        const y = now.getFullYear(), m = now.getMonth();
+        const first = new Date(y, m, 1).getDay();
+        const days = new Date(y, m + 1, 0).getDate();
+        const tbl = document.getElementById("calendar");
+        tbl.innerHTML = "";
+
+        const head = document.createElement("tr");
+        ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach(d => {
+          const th = document.createElement("th");
+          th.textContent = d; head.appendChild(th);
+        });
+        tbl.appendChild(head);
+
+        let row = document.createElement("tr");
+        for (let i = 0; i < first; i++) row.appendChild(document.createElement("td"));
+
+        for (let d = 1; d <= days; d++) {
+          if (row.children.length === 7) {
+            tbl.appendChild(row); row = document.createElement("tr");
+          }
+          const cell = document.createElement("td");
+          cell.textContent = d;
+          if (d === now.getDate()) cell.classList.add("today");
+          row.appendChild(cell);
+        }
+        if (row.children.length) tbl.appendChild(row);
+      }
+      renderCalendar();
+
+      /* BRIGHTNESS POPUP */
+      let brightness = 0;
+      const brightBtn = document.getElementById("brightBtn");
+      const brightValue = document.getElementById("brightValue");
+      const popup = document.getElementById("popup-bg");
+      const slider = document.getElementById("brightnessSlider");
+      const textBox = document.getElementById("brightnessText");
+
+      function updateBrightness() {
+        brightValue.textContent = brightness;
+
+        if (brightness > 0) {
+          brightBtn.classList.add("active");
+        } else {
+          brightBtn.classList.remove("active");
+        }
+      }
+
+      brightBtn.onclick = () => {
+        slider.value = brightness;
+        textBox.value = brightness;
+        popup.style.display = "flex";
+      };
+
+      document.getElementById("minus").onclick = () => {
+        brightness = Math.max(0, brightness - 1);
+        slider.value = brightness; textBox.value = brightness;
+      };
+      document.getElementById("plus").onclick = () => {
+        brightness = Math.min(100, brightness + 1);
+        slider.value = brightness; textBox.value = brightness;
+      };
+      slider.oninput = () => {
+        brightness = parseInt(slider.value);
+        textBox.value = brightness;
+      };
+      textBox.oninput = () => {
+        const v = parseInt(textBox.value);
+        if (!isNaN(v)) {
+          brightness = Math.max(0, Math.min(100, v));
+          slider.value = brightness;
+        }
+      };
+      document.getElementById("setBtn").onclick = async () => {
+        await fetch(`/api/brightness/set?value=${brightness}`);
+        updateBrightness();
+        popup.style.display = "none";
+      };
+      popup.onclick = e => {
+        if (e.target === popup) popup.style.display = "none";
+      };
+      document.getElementById("offBtn").onclick = async () => {
+        brightness = 0;
+        slider.value = 0;
+        textBox.value = 0;
+
+        await fetch(`/api/brightness/set?value=0`);
+
+        updateBrightness();
+        popup.style.display = "none";
+      };
+      async function fetchBrightness() {
+        try {
+          const res = await fetch('/api/brightness/get');
+          const data = await res.json();
+
+          brightness = data.brightness; // update global
+          updateBrightness();
+
+        } catch (e) {
+          console.log("Brightness fetch failed:", e);
+        }
+      }
+      async function fetchWifi() {
+        try {
+          const res = await fetch('/api/wifi/get');
+          const data = await res.json();
+
+          document.getElementById("wifiSsid").textContent = data.ap || "Not Connected";
+          document.getElementById("mac").textContent = data.mac || "—";
+          document.getElementById("ip").textContent = data.ip || "—";
+
+        } catch (e) {
+          console.log("WiFi fetch error:", e);
+        }
+      }
+      async function fetchBattery() {
+        try {
+          const res = await fetch('/api/battery');
+          const data = await res.json();
+
+          battery = data.battery;
+          document.getElementById("batt").textContent = data.battery + "%" || "---";
+
+        } catch (e) {
+          console.log("Battery fetch failed:", e);
+        }
+      }
+      async function refreshGoldGraph() {
+        document.getElementById("goldGraph").src = "/api/gold/graph?t=" + Date.now();
+      }
+
+      async function fetchGold() {
+        try {
+          const res = await fetch('/api/gold');
+          const data = await res.json();
+
+          let rows = "";
+          const tableObj = JSON.parse(data.tableValue);
+          for (const [date, price] of Object.entries(tableObj)) {
+
+            rows += `
+                      <tr>
+                      <td>₹${price}</td>
+                        <td>${date}</td>
+                      </tr>
+                      `;
+          }
+
+          // Reverse order: latest first (optional)
+          rows = rows.split("\n").reverse().join("\n");
+
+          document.getElementById("goldBox").innerHTML = `
+                        <table class="unstyledTable">
+
+                               ${rows}
+                        </tbody>
+                        </tr>
+                        </table>
+                      `;
+
+
+          //document.getElementById("goldBox").innerHTML =
+          //  `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
+
+          document.getElementById("goldBox2").innerHTML =
+            `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
+
+          document.getElementById("goldBox3").innerHTML =
+            `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
+
+          document.getElementById("goldBox4").innerHTML =
+            `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
+
+        } catch (e) {
+          document.getElementById("goldBox").textContent = e;
+        }
+      }
+
+      document.getElementById("btnReload").onclick = async () => {
+        const overlay = document.getElementById("fullRefreshOverlay");
+
+        overlay.style.display = "block";    // screen turns fully black
+        setTimeout(() => {
+          overlay.style.display = "none"; // return to normal
+        }, 800);  // 300 ms is ideal for Kindle refresh
+      };
+
+      document.getElementById("btnPrinter").onclick = async () => {
+        const btnPrinter = document.getElementById("btnPrinter");
+        btnPrinter.classList.toggle("active");
+      };
+      document.getElementById("btnClose").onclick = async () => {
+        if (confirm("Arey you sure you want to close?")) {
+          const btnClose = document.getElementById("btnClose");
+          btnClose.classList.toggle("active");
+
+        }
+      };
+
+      fetchGold();
+
+      //refreshGoldGraph();
+      //setInterval(refreshGoldGraph, 3600000); // 1 hour
+      fetchBrightness();
+      fetchWifi();
+      updateBrightness();
+      fetchBattery();
+
+      setInterval(fetchBattery, 5 * 60 * 1000);   // 300000 ms
+    </script>
+
+</body>
+</html>

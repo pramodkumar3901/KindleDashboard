@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "KindleDashboard": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://192.168.1.51:5001;http://192.168.1.51:5000"
+    }
+  }
+}
