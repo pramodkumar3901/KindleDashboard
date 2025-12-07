@@ -26,7 +26,7 @@ public class KindleIpMonitor : BackgroundService
 
           // IMPORTANT: provide your Kindle's fixed host key here
           //string hostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHJTEq8792RN2EKbFudxGwEivgs//EEKhWGSuw8oeD75";
-          string hostKey = "0x49a67e8d01f64e0d4e99808922b96d5e3f4b92b7039aacd0f4b8d11c93f001d,0x793e78280fbb9261850a41fc3f0bbe22011b71e7169b42d84d64f73baf125372";
+          string hostKey = "0x1c38eeaf996089271ecf79e748c2712977ddea9f085c329b7c67d9a1d127a9c5,0x6f683449a4d21786b56f0d50114feb4884ed564c885f1ac303bd2bbb3cf65c59";
 
           UpdatePlinkHostKey(newIp, hostKey);
 
