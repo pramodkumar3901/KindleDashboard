@@ -180,18 +180,19 @@
         transition: filter 0.2s;
       }
 
-    /* Active state */
+      /* Active state */
       .bright-btn.active {
         background: black;
         border-color: black;
-        color:white;
+        color: white;
       }
 
         .bright-btn.active img {
           filter: invert(1); /* white */
         }
+
         .bright-btn.active span {
-          color:white;
+          color: white;
         }
 
     .btn-text {
@@ -207,7 +208,7 @@
       font-size: 1.2rem;
     }
 
-   
+
     /* POPUP OVERLAY — NO ROTATION HERE! */
     #popup-bg {
       position: fixed;
@@ -244,8 +245,8 @@
       background: #fff;
       border-radius: 4px;
       cursor: pointer;
-      height:50px;
-      width:50px;
+      height: 50px;
+      width: 50px;
     }
 
     #brightnessSlider {
@@ -263,13 +264,20 @@
     }
 
     /* BOTTOM BAR */
+
     .footer-bar {
       grid-column: 1/-1;
-      font-size: 0.8rem;
-      color: #444;
-      border-top: 1px solid #eee;
-      padding-top: 6px;
-      text-align: right;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .footer-item {
+      background: #000;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
       height: 15px;
     }
 
@@ -396,18 +404,18 @@
 
         <!-- TOP BAR -->
         <!--<header class="top-bar">
-        <div class="title"></div>
+          <div class="title"></div>
 
-        <div class="top-right">
-          <div class="top-info">
+          <div class="top-right">
+            <div class="top-info">
 
+            </div>
+
+            <div class="top-info">
+
+            </div>
           </div>
-
-          <div class="top-info">
-
-          </div>
-        </div>
-      </header>-->
+        </header>-->
         <!-- LEFT -->
         <section class="left-pane">
           <div id="clockBox" class="clock-box am">
@@ -431,7 +439,7 @@
           <!--<div style="display:flex; gap:12px; width:100%">
             <div class="sml-btn">
               <div style="font-size:20px;">☀</div>
-              
+
             </div>
 
 
@@ -488,23 +496,23 @@
                 <div style="font-size:40px;">☀</div>
               </div>
             </div>
-           
+
             <!-- SECOND ROW OF BUTTONS -->
             <div style="display: flex; gap: 12px; width: 100%">
-              <div id="goldBox" class="gold-box"></div>
+
               <div id="goldBox2" class="gold-box"></div>
             </div>
             <!-- Third ROW OF BUTTONS -->
             <!--<div style="display: flex; gap: 12px; width: 100%">
-    <div id="goldBox3" class="gold-box"></div>
-    <div id="goldBox4" class="gold-box"></div>
-  </div>-->
-</section>
+              <div id="goldBox3" class="gold-box"></div>
+              <div id="goldBox4" class="gold-box"></div>
+            </div>-->
+        </section>
         <!-- BOTTOM -->
         <footer class="footer-bar">
-          MAC: <span id="mac">D4:91:0F:70:0C:D3</span> |
-          IP: <span id="ip">125.251.12.11</span> |
-          SS: <span id="screensaver">off</span>
+          <div class="footer-item">MAC: <span id="mac">D4:91:0F:70:0C:D3</span></div>
+          <div class="footer-item">IP: <span id="ip">---</span></div>
+          <div class="footer-item">SS: <span id="screensaver">off</span></div>
         </footer>
 
       </div>
@@ -531,216 +539,211 @@
 
       <div class="popup" id="goldGraph">
       </div>
-      </div>
-      <div id="fullRefreshOverlay"></div>
+    </div>
+    <div id="fullRefreshOverlay"></div>
 
-      <script>
-        /* CLOCK */
-        function updateClock() {
-          const now = new Date();
-          let h = now.getHours();
-          const m = String(now.getMinutes()).padStart(2, '0');
-          const ampm = h >= 12 ? "PM" : "AM";
-          h = h % 12 || 12;
+    <script>
+      /* CLOCK */
+      function updateClock() {
+        const now = new Date();
+        let h = now.getHours();
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const ampm = h >= 12 ? "PM" : "AM";
+        h = h % 12 || 12;
 
-          document.getElementById("clock").textContent = h + ":" + m;
-          document.getElementById("dateText").textContent =
-            now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+        document.getElementById("clock").textContent = h + ":" + m;
+        document.getElementById("dateText").textContent =
+          now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
 
-          const cb = document.getElementById("clockBox");
-          cb.classList.toggle("pm", ampm === "PM");
-          cb.classList.toggle("am", ampm === "AM");
-        }
-        updateClock();
-        setInterval(updateClock, 60000);
+        const cb = document.getElementById("clockBox");
+        cb.classList.toggle("pm", ampm === "PM");
+        cb.classList.toggle("am", ampm === "AM");
+      }
+      updateClock();
+      setInterval(updateClock, 60000);
 
-        /* CALENDAR */
-        function renderCalendar() {
-          const now = new Date();
-          const y = now.getFullYear(), m = now.getMonth();
-          const first = new Date(y, m, 1).getDay();
-          const days = new Date(y, m + 1, 0).getDate();
-          const tbl = document.getElementById("calendar");
-          tbl.innerHTML = "";
+      /* CALENDAR */
+      function renderCalendar() {
+        const now = new Date();
+        const y = now.getFullYear(), m = now.getMonth();
+        const first = new Date(y, m, 1).getDay();
+        const days = new Date(y, m + 1, 0).getDate();
+        const tbl = document.getElementById("calendar");
+        tbl.innerHTML = "";
 
-          const head = document.createElement("tr");
-          ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach(d => {
-            const th = document.createElement("th");
-            th.textContent = d; head.appendChild(th);
-          });
-          tbl.appendChild(head);
+        const head = document.createElement("tr");
+        ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach(d => {
+          const th = document.createElement("th");
+          th.textContent = d; head.appendChild(th);
+        });
+        tbl.appendChild(head);
 
-          let row = document.createElement("tr");
-          for (let i = 0; i < first; i++) row.appendChild(document.createElement("td"));
+        let row = document.createElement("tr");
+        for (let i = 0; i < first; i++) row.appendChild(document.createElement("td"));
 
-          for (let d = 1; d <= days; d++) {
-            if (row.children.length === 7) {
-              tbl.appendChild(row); row = document.createElement("tr");
-            }
-            const cell = document.createElement("td");
-            cell.textContent = d;
-            if (d === now.getDate()) cell.classList.add("today");
-            row.appendChild(cell);
+        for (let d = 1; d <= days; d++) {
+          if (row.children.length === 7) {
+            tbl.appendChild(row); row = document.createElement("tr");
           }
-          if (row.children.length) tbl.appendChild(row);
+          const cell = document.createElement("td");
+          cell.textContent = d;
+          if (d === now.getDate()) cell.classList.add("today");
+          row.appendChild(cell);
         }
-        renderCalendar();
+        if (row.children.length) tbl.appendChild(row);
+      }
+      renderCalendar();
 
-        /* BRIGHTNESS POPUP */
-        let brightness = 0;
-        const brightBtn = document.getElementById("brightBtn");
-        const brightValue = document.getElementById("brightValue");
-        const popup = document.getElementById("popup-bg");
-        const slider = document.getElementById("brightnessSlider");
-        const textBox = document.getElementById("brightnessText");
+      /* BRIGHTNESS POPUP */
+      let brightness = 0;
+      const brightBtn = document.getElementById("brightBtn");
+      const brightValue = document.getElementById("brightValue");
+      const popup = document.getElementById("popup-bg");
+      const slider = document.getElementById("brightnessSlider");
+      const textBox = document.getElementById("brightnessText");
 
-        function updateBrightness() {
-          brightValue.textContent = brightness;
+      function updateBrightness() {
+        brightValue.textContent = brightness;
 
-          if (brightness > 0) {
-            brightBtn.classList.add("active");
-          } else {
-            brightBtn.classList.remove("active");
-          }
+        if (brightness > 0) {
+          brightBtn.classList.add("active");
+        } else {
+          brightBtn.classList.remove("active");
         }
+      }
 
-        brightBtn.onclick = () => {
+      brightBtn.onclick = () => {
+        slider.value = brightness;
+        textBox.value = brightness;
+        popup.style.display = "flex";
+      };
+
+      document.getElementById("minus").onclick = () => {
+        brightness = Math.max(0, brightness - 1);
+        slider.value = brightness; textBox.value = brightness;
+      };
+      document.getElementById("plus").onclick = () => {
+        brightness = Math.min(100, brightness + 1);
+        slider.value = brightness; textBox.value = brightness;
+      };
+      slider.oninput = () => {
+        brightness = parseInt(slider.value);
+        textBox.value = brightness;
+      };
+      textBox.oninput = () => {
+        const v = parseInt(textBox.value);
+        if (!isNaN(v)) {
+          brightness = Math.max(0, Math.min(100, v));
           slider.value = brightness;
-          textBox.value = brightness;
-          popup.style.display = "flex";
-        };
-
-        document.getElementById("minus").onclick = () => {
-          brightness = Math.max(0, brightness - 1);
-          slider.value = brightness; textBox.value = brightness;
-        };
-        document.getElementById("plus").onclick = () => {
-          brightness = Math.min(100, brightness + 1);
-          slider.value = brightness; textBox.value = brightness;
-        };
-        slider.oninput = () => {
-          brightness = parseInt(slider.value);
-          textBox.value = brightness;
-        };
-        textBox.oninput = () => {
-          const v = parseInt(textBox.value);
-          if (!isNaN(v)) {
-            brightness = Math.max(0, Math.min(100, v));
-            slider.value = brightness;
-          }
-        };
-        document.getElementById("setBtn").onclick = async () => {
-          await fetch(`/api/brightness/set?value=${brightness}`);
-          updateBrightness();
-          popup.style.display = "none";
-        };
-        popup.onclick = e => {
-          if (e.target === popup) popup.style.display = "none";
-        };
-        document.getElementById("offBtn").onclick = async () => {
-          brightness = 0;
-          slider.value = 0;
-          textBox.value = 0;
-
-          await fetch(`/api/brightness/set?value=0`);
-
-          updateBrightness();
-          popup.style.display = "none";
-        };
-
-        async function fetchGold() {
-          try {
-            const res = await fetch('/api/gold');
-            const data = await res.json();
-
-            let rows = "";
-            const tableObj = JSON.parse(data.tableValue);
-            for (const [date, price] of Object.entries(tableObj)) {
-
-              rows += `
-                            <tr>
-                            <td>₹${price}</td>
-                              <td>${date}</td>
-                            </tr>
-                            `;
-            }
-
-            // Reverse order: latest first (optional)
-            rows = rows.split("\n").reverse().join("\n");
-
-            //document.getElementById("goldBox").innerHTML = `
-            //              <table class="unstyledTable">
-
-            //                     ${rows}
-            //              </tbody>
-            //              </tr>
-            //              </table>
-            //            `;
-
-
-            //document.getElementById("goldBox").innerHTML =
-            //  `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
-
-            document.getElementById("goldBox2").innerHTML =
-              `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
-
-            //document.getElementById("goldBox3").innerHTML =
-            //  `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
-
-            //document.getElementById("goldBox4").innerHTML =
-            //  `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
-
-          } catch (e) {
-            document.getElementById("goldBox").textContent = e;
-          }
         }
+      };
+      document.getElementById("setBtn").onclick = async () => {
+        await fetch(`/api/brightness/set?value=${brightness}`);
+        updateBrightness();
+        popup.style.display = "none";
+      };
+      popup.onclick = e => {
+        if (e.target === popup) popup.style.display = "none";
+      };
+      document.getElementById("offBtn").onclick = async () => {
+        brightness = 0;
+        slider.value = 0;
+        textBox.value = 0;
 
-        document.getElementById("btnReload").onclick = async () => {
-          const overlay = document.getElementById("fullRefreshOverlay");
+        await fetch(`/api/brightness/set?value=0`);
 
-          overlay.style.display = "block";    // screen turns fully black
-          setTimeout(() => {
-            overlay.style.display = "none"; // return to normal
-          }, 800);  // 300 ms is ideal for Kindle refresh
-        };
+        updateBrightness();
+        popup.style.display = "none";
+      };
 
-        document.getElementById("btnPrinter").onclick = async () => {
+      /* DAILY GOLD VALUE */
+      async function fetchGold() {
+        try {
+          const res = await fetch('/api/gold');
+          const data = await res.json();
+
+          let rows = "";
+          const tableObj = JSON.parse(data.tableValue);
+          for (const [date, price] of Object.entries(tableObj)) {
+
+            rows += `
+                                <tr>
+                                <td>₹${price}</td>
+                                  <td>${date}</td>
+                                </tr>
+                                `;
+          }
+
+          // Reverse order: latest first (optional)
+          rows = rows.split("\n").reverse().join("\n");
+
+          //document.getElementById("goldBox").innerHTML = `
+          //              <table class="unstyledTable">
+
+          //                     ${rows}
+          //              </tbody>
+          //              </tr>
+          //              </table>
+          //            `;
+
+
+          //document.getElementById("goldBox").innerHTML =
+          //  `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
+
+          document.getElementById("goldBox2").innerHTML =
+            `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
+
+        } catch (e) {
+          document.getElementById("goldBox").textContent = e;
+        }
+      }
+
+      document.getElementById("btnReload").onclick = async () => {
+        const overlay = document.getElementById("fullRefreshOverlay");
+
+        overlay.style.display = "block";    // screen turns fully black
+        setTimeout(() => {
+          overlay.style.display = "none"; // return to normal
+        }, 800);  // 300 ms is ideal for Kindle refresh
+      };
+
+      document.getElementById("btnPrinter").onclick = async () => {
+        const btnPrinter = document.getElementById("btnPrinter");
+        btnPrinter.classList.toggle("active");
+      };
+
+      async function fetchStatusDump() {
+        try {
+          const res = await fetch('/api/getStatusDump');
+          const data = await res.json();
+
+          const statusObj = JSON.parse(data.status);
+
+          document.getElementById("wifiSsid").textContent = statusObj.ssid || "Not Connected";
+          document.getElementById("ip").textContent = statusObj.ip_address || "—";
+          document.getElementById("batt").textContent = statusObj.battery + "%" || "—";
+          document.getElementById("screensaver").textContent = statusObj.screensaver == 0 ? "ON" : "OFF" || "—";
+
+          brightness = statusObj.brightness || 0;
+          updateBrightness();
+
           const btnPrinter = document.getElementById("btnPrinter");
-          btnPrinter.classList.toggle("active");
-        };
-        document.getElementById("btnClose").onclick = async () => {
-          if (confirm("Arey you sure you want to close?")) {
-            const btnClose = document.getElementById("btnClose");
-            btnClose.classList.toggle("active");
-
+          if (data.printerOnline) {
+            btnPrinter.classList.add("active");
+          } else {
+            btnPrinter.classList.remove("active");
           }
-        };
 
-        async function fetchStatusDump() {
-          try {
-            const res = await fetch('/api/getStatusDump');
-            const data = await res.json();
+        } catch (e) {
+          //document.getElementById("goldBox").textContent = e;
+        }
+      };
 
-            const statusObj = JSON.parse(data.status);
+      fetchStatusDump();
+      setInterval(fetchStatusDump, 10 * 1000);   // 10 sec
+      fetchGold();
 
-            document.getElementById("wifiSsid").textContent = statusObj.ssid || "Not Connected";
-            document.getElementById("ip").textContent = statusObj.ip_address || "—";
-            document.getElementById("batt").textContent = statusObj.battery +"%" || "—";
-            document.getElementById("screensaver").textContent = statusObj.screensaver == 0? "ON" : "OFF" || "—";
-            
-            brightness = statusObj.brightness || 0;
-            updateBrightness();
-
-          }catch (e) {
-            //document.getElementById("goldBox").textContent = e;
-          }
-        };
-
-        fetchStatusDump();
-        setInterval(fetchStatusDump, 10 * 1000);   // 10 sec
-        fetchGold();
-
-      </script>
+    </script>
 
 </body>
 </html>

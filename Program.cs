@@ -1,4 +1,4 @@
-﻿using KindleDashboard.Models;
+using KindleDashboard.Models;
 using SkiaSharp;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -70,7 +70,20 @@ app.MapGet("/api/getStatusDump", () =>
   string output = proc.StandardOutput.ReadToEnd();
   proc.WaitForExit();
 
-  return Results.Json(new { ok = true, status = output });
+  var arpPsi = new ProcessStartInfo
+  {
+    FileName = "arp",
+    Arguments = "-a",
+    RedirectStandardOutput = true,
+    UseShellExecute = false,
+    CreateNoWindow = true
+  };
+  var arpProc = Process.Start(arpPsi);
+  string arpOutput = arpProc.StandardOutput.ReadToEnd();
+  arpProc.WaitForExit();
+  bool _printerOnline = arpOutput.Contains("5c-60-ba-83-f5-32", StringComparison.OrdinalIgnoreCase);//5c-60-ba-83-f5-32
+
+  return Results.Json(new { ok = true, status = output, printerOnline = _printerOnline });
 });
 
 app.MapGet("/api/gold", async () =>

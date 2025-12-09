@@ -144,5 +144,20 @@ html, body {
   gap: var(--gap);
 }
 
+.footer-bar {
+  grid-column: 1/-1;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.footer-item {
+  background: #000;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
 .widget {
   b
