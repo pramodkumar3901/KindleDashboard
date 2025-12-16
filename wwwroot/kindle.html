@@ -1,363 +1,12 @@
-
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Kindle Dashboard</title>
 
-  <style>
-    :root {
-      --bg: #fff;
-      --fg: #000;
-      --gap: 12px;
-      --radius: 8px;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      color: #000;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-    }
-
-    /* MAIN ROTATOR (ONLY HERE) */
-    #rotator {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vh;
-      height: 100vw;
-      transform-origin: 0 0;
-      transform: rotate(-90deg) translate(-100%,0);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* DASHBOARD */
-    .dashboard {
-      width: 740px;
-      height: 580px;
-      padding: 14px;
-      box-sizing: border-box;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      display: grid;
-      grid-template-columns: 30% 70%;
-      grid-template-rows: auto 1fr auto;
-      gap: var(--gap);
-    }
-
-    /* TOP BAR */
-    .top-bar {
-      grid-column: 1/-1;
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 6px;
-    }
-
-    .title {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .top-info {
-      font-size: 0.9rem;
-      border: 1px solid gray;
-      padding-left: 4px;
-      padding-right: 4px;
-      color: #444;
-    }
-
-    /* LEFT PANEL */
-    .left-pane {
-      display: flex;
-      flex-direction: column;
-      gap: var(--gap);
-    }
-
-    .clock-box {
-      padding: 16px;
-      border: 1px solid #eee;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-      .clock-box.am {
-        background: #fff;
-        color: #000;
-      }
-
-      .clock-box.pm {
-        background: #000;
-        color: #fff;
-      }
-
-    #clock {
-      font-size: 3.8rem;
-      font-weight: 600;
-    }
-
-    #dateText {
-      margin-top: 12px;
-      font-size: 1.1rem;
-    }
-
-    /* CALENDAR */
-    .cal-box {
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 10px;
-    }
-
-      .cal-box table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: center;
-        font-size: 0.8rem;
-      }
-
-      .cal-box th {
-        color: #444;
-      }
-
-      .cal-box td {
-        padding: 3px;
-        border-radius: 4px;
-      }
-
-    .today {
-      background: #000;
-      color: #fff;
-    }
-
-    /* RIGHT SIDE */
-    .right-pane {
-      display: flex;
-      padding-top: 4px;
-    }
-
-    .sml-btn {
-      width: 100%;
-      /*height: 75px;*/
-      border: 1px solid #000;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 2rem;
-      margin: 5px;
-    }
-
-    .bright-btn {
-      width: 100%;
-      height: 100px;
-      border: 1px solid #000;
-      border-radius: 8px;
-      margin: 2px;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column; /* icon on top, text below */
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-      .bright-btn img {
-        width: 32px;
-        height: 32px;
-        filter: invert(0); /* black */
-        transition: filter 0.2s;
-      }
-
-      /* Active state */
-      .bright-btn.active {
-        background: black;
-        border-color: black;
-        color: white;
-      }
-
-        .bright-btn.active img {
-          filter: invert(1); /* white */
-        }
-
-        .bright-btn.active span {
-          color: white;
-        }
-
-    .btn-text {
-      font-size: 14px;
-      color: black;
-    }
-
-    .toggle-btn.active .btn-text {
-      color: white; /* invert text color too */
-    }
-
-    .bright-value {
-      font-size: 1.2rem;
-    }
-
-
-    /* POPUP OVERLAY — NO ROTATION HERE! */
-    #popup-bg {
-      position: fixed;
-      inset: 0;
-      display: none;
-      background: rgba(0,0,0,0.45);
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-      /* Centering fix for rotated popup */
-      transform-origin: center center;
-      transform: rotate(-90deg) translate(-50%, 0);
-    }
-
-    .popup {
-      background: #fff;
-      border: 1px solid #000;
-      border-radius: 8px;
-      padding: 16px;
-      width: 280px;
-      text-align: center;
-    }
-
-    .popup-row {
-      margin-top: 12px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
-
-    .popup-btn {
-      border: 1px solid #000;
-      padding: 6px 10px;
-      background: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-      height: 50px;
-      width: 50px;
-    }
-
-    #brightnessSlider {
-      width: 100px;
-    }
-
-    .set-btn {
-      margin-top: 16px;
-      padding: 8px 20px;
-      background: #000;
-      color: #fff;
-      border: 1px solid #000;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* BOTTOM BAR */
-
-    .footer-bar {
-      grid-column: 1/-1;
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-    }
-
-    .footer-item {
-      background: #000;
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      height: 15px;
-      font-weight: 700;
-    }
-
-    /* icon sizing and color helpers */
-    .icon {
-      display: inline-block;
-      width: 22px; /* change size by overriding width/height */
-      height: 22px;
-      vertical-align: middle;
-      color: #000; /* icons use currentColor */
-      fill: currentColor;
-      stroke: currentColor;
-    }
-
-    /* larger / smaller */
-    .icon-lg {
-      width: 28px;
-      height: 28px;
-    }
-
-    .icon-sm {
-      width: 16px;
-      height: 16px;
-    }
-
-    /* invert for dark backgrounds */
-    .icon-invert {
-      color: #fff;
-    }
-
-    .top-right {
-      display: flex;
-      gap: 10px; /* keeps them close */
-      align-items: center;
-    }
-
-    .gold-box {
-      border: 1px solid #000;
-      border-radius: 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1rem;
-      margin-top: 12px;
-    }
-
-    table.unstyledTable {
-      /*border: 1px solid #000000;*/
-      width: 100%;
-    }
-
-      table.unstyledTable td, table.unstyledTable th {
-        border: 1px solid #AAAAAA;
-      }
-
-        table.unstyledTable td:nth-child(even) {
-          background: #D0E4F5;
-        }
-
-      table.unstyledTable thead {
-        background: #DDDDDD;
-      }
-
-        table.unstyledTable thead th {
-          font-size: 15px;
-          font-weight: bold;
-        }
-
-    #fullRefreshOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: black;
-      z-index: 999999;
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -367,8 +16,10 @@
   <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
     <!-- WIFI: 3 bars -->
     <symbol id="ico-wifi-3" viewBox="0 0 24 24">
-      <path d="M2 8c6-7 14-7 20 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M6 12c4-5 8-5 12 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M2 8c6-7 14-7 20 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"
+        stroke-linejoin="round" />
+      <path d="M6 12c4-5 8-5 12 0" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"
+        stroke-linejoin="round" />
       <circle cx="12" cy="18" r="1.6" fill="currentColor" />
     </symbol>
 
@@ -404,19 +55,8 @@
       <div class="dashboard">
 
         <!-- TOP BAR -->
-        <!--<header class="top-bar">
-          <div class="title"></div>
-
-          <div class="top-right">
-            <div class="top-info">
-
-            </div>
-
-            <div class="top-info">
-
-            </div>
-          </div>
-        </header>-->
+        <!-- TOP BAR -->
+        <!-- HEADER REMOVED -->
         <!-- LEFT -->
         <section class="left-pane">
           <div id="clockBox" class="clock-box am">
@@ -429,29 +69,19 @@
           </div>
           <div style="display:flex; gap:12px; width:100%">
             <div class="sml-btn">
-              <svg class="icon"><use href="#ico-batt-4"></use></svg>
+              <svg class="icon">
+                <use href="#ico-batt-4"></use>
+              </svg>
               <span id="batt" style="font-size:16px;">---</span>
             </div>
             <div class="sml-btn">
-              <svg class="icon"><use href="#ico-wifi-3"></use></svg>
+              <svg class="icon">
+                <use href="#ico-wifi-3"></use>
+              </svg>
               <span id="wifiSsid" style="font-size:10px;">---</span>
             </div>
           </div>
-          <!--<div style="display:flex; gap:12px; width:100%">
-            <div class="sml-btn">
-              <div style="font-size:20px;">☀</div>
 
-            </div>
-
-
-          </div>
-          <div style="display:flex; gap:12px; width:100%">
-            <div class="sml-btn">
-              <div style="font-size:20px;">☀</div>
-            </div>
-
-
-          </div>-->
         </section>
 
         <!-- RIGHT -->
@@ -504,10 +134,8 @@
               <div id="goldBox2" class="gold-box"></div>
             </div>
             <!-- Third ROW OF BUTTONS -->
-            <!--<div style="display: flex; gap: 12px; width: 100%">
-              <div id="goldBox3" class="gold-box"></div>
-              <div id="goldBox4" class="gold-box"></div>
-            </div>-->
+            <!-- Third ROW OF BUTTONS -->
+            <!-- Third ROW OF BUTTONS REMOVED -->
         </section>
         <!-- BOTTOM -->
         <footer class="footer-bar">
@@ -543,208 +171,8 @@
     </div>
     <div id="fullRefreshOverlay"></div>
 
-    <script>
-      /* CLOCK */
-      function updateClock() {
-        const now = new Date();
-        let h = now.getHours();
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const ampm = h >= 12 ? "PM" : "AM";
-        h = h % 12 || 12;
-
-        document.getElementById("clock").textContent = h + ":" + m;
-        document.getElementById("dateText").textContent =
-          now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
-
-        const cb = document.getElementById("clockBox");
-        cb.classList.toggle("pm", ampm === "PM");
-        cb.classList.toggle("am", ampm === "AM");
-      }
-      updateClock();
-      setInterval(updateClock, 60000);
-
-      /* CALENDAR */
-      function renderCalendar() {
-        const now = new Date();
-        const y = now.getFullYear(), m = now.getMonth();
-        const first = new Date(y, m, 1).getDay();
-        const days = new Date(y, m + 1, 0).getDate();
-        const tbl = document.getElementById("calendar");
-        tbl.innerHTML = "";
-
-        const head = document.createElement("tr");
-        ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach(d => {
-          const th = document.createElement("th");
-          th.textContent = d; head.appendChild(th);
-        });
-        tbl.appendChild(head);
-
-        let row = document.createElement("tr");
-        for (let i = 0; i < first; i++) row.appendChild(document.createElement("td"));
-
-        for (let d = 1; d <= days; d++) {
-          if (row.children.length === 7) {
-            tbl.appendChild(row); row = document.createElement("tr");
-          }
-          const cell = document.createElement("td");
-          cell.textContent = d;
-          if (d === now.getDate()) cell.classList.add("today");
-          row.appendChild(cell);
-        }
-        if (row.children.length) tbl.appendChild(row);
-      }
-      renderCalendar();
-
-      /* BRIGHTNESS POPUP */
-      let brightness = 0;
-      const brightBtn = document.getElementById("brightBtn");
-      const brightValue = document.getElementById("brightValue");
-      const popup = document.getElementById("popup-bg");
-      const slider = document.getElementById("brightnessSlider");
-      const textBox = document.getElementById("brightnessText");
-
-      function updateBrightness() {
-        brightValue.textContent = brightness;
-
-        if (brightness > 0) {
-          brightBtn.classList.add("active");
-        } else {
-          brightBtn.classList.remove("active");
-        }
-      }
-
-      brightBtn.onclick = () => {
-        slider.value = brightness;
-        textBox.value = brightness;
-        popup.style.display = "flex";
-      };
-
-      document.getElementById("minus").onclick = () => {
-        brightness = Math.max(0, brightness - 1);
-        slider.value = brightness; textBox.value = brightness;
-      };
-      document.getElementById("plus").onclick = () => {
-        brightness = Math.min(100, brightness + 1);
-        slider.value = brightness; textBox.value = brightness;
-      };
-      slider.oninput = () => {
-        brightness = parseInt(slider.value);
-        textBox.value = brightness;
-      };
-      textBox.oninput = () => {
-        const v = parseInt(textBox.value);
-        if (!isNaN(v)) {
-          brightness = Math.max(0, Math.min(100, v));
-          slider.value = brightness;
-        }
-      };
-      document.getElementById("setBtn").onclick = async () => {
-        await fetch(`/api/brightness/set?value=${brightness}`);
-        updateBrightness();
-        popup.style.display = "none";
-      };
-      popup.onclick = e => {
-        if (e.target === popup) popup.style.display = "none";
-      };
-      document.getElementById("offBtn").onclick = async () => {
-        brightness = 0;
-        slider.value = 0;
-        textBox.value = 0;
-
-        await fetch(`/api/brightness/set?value=0`);
-
-        updateBrightness();
-        popup.style.display = "none";
-      };
-
-      /* DAILY GOLD VALUE */
-      async function fetchGold() {
-        try {
-          const res = await fetch('/api/gold');
-          const data = await res.json();
-
-          let rows = "";
-          const tableObj = JSON.parse(data.tableValue);
-          for (const [date, price] of Object.entries(tableObj)) {
-
-            rows += `
-                                <tr>
-                                <td>₹${price}</td>
-                                  <td>${date}</td>
-                                </tr>
-                                `;
-          }
-
-          // Reverse order: latest first (optional)
-          rows = rows.split("\n").reverse().join("\n");
-
-          //document.getElementById("goldBox").innerHTML = `
-          //              <table class="unstyledTable">
-
-          //                     ${rows}
-          //              </tbody>
-          //              </tr>
-          //              </table>
-          //            `;
-
-
-          //document.getElementById("goldBox").innerHTML =
-          //  `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
-
-          document.getElementById("goldBox2").innerHTML =
-            `<img src="data:image/png;base64,${data.graph}" style="width:100%;" />`;
-
-        } catch (e) {
-          document.getElementById("goldBox").textContent = e;
-        }
-      }
-
-      document.getElementById("btnReload").onclick = async () => {
-        const overlay = document.getElementById("fullRefreshOverlay");
-
-        overlay.style.display = "block";    // screen turns fully black
-        setTimeout(() => {
-          overlay.style.display = "none"; // return to normal
-        }, 800);  // 300 ms is ideal for Kindle refresh
-      };
-
-      document.getElementById("btnPrinter").onclick = async () => {
-        const btnPrinter = document.getElementById("btnPrinter");
-        btnPrinter.classList.toggle("active");
-      };
-
-      async function fetchStatusDump() {
-        try {
-          const res = await fetch('/api/getStatusDump');
-          const data = await res.json();
-
-          const statusObj = JSON.parse(data.status);
-
-          document.getElementById("wifiSsid").textContent = statusObj.ssid || "Not Connected";
-          document.getElementById("ip").textContent = statusObj.ip_address || "—";
-          document.getElementById("batt").textContent = statusObj.battery + "%" || "—";
-          document.getElementById("screensaver").textContent = statusObj.screensaver == 0 ? "ON" : "OFF" || "—";
-
-          brightness = statusObj.brightness || 0;
-          updateBrightness();
-
-          const btnPrinter = document.getElementById("btnPrinter");
-          if (data.printerOnline) {
-            btnPrinter.classList.add("active");
-          } else {
-            btnPrinter.classList.remove("active");
-          }
-
-        } catch (e) {
-          //document.getElementById("goldBox").textContent = e;
-        }
-      };
-
-      fetchStatusDump();
-      setInterval(fetchStatusDump, 10 * 1000);   // 10 sec
-      fetchGold();
-
-    </script>
+    <script src="js/script.js"></script>
 
 </body>
+
 </html>

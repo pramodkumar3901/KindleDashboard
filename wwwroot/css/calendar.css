@@ -1,0 +1,121 @@
+:root {
+    --bg: #ffffff;
+    --fg: #000000;
+    --holiday-bg: #e6e6e6;
+    /* Light gray for weekend */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#rotator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vh;
+    height: 100vw;
+    transform-origin: 0 0;
+    transform: rotate(-90deg) translate(-100%, 0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg);
+}
+
+.main-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+/* Header with Back, Prev, Title, Next */
+.header {
+    display: grid;
+    grid-template-columns: 50px 50px 1fr 50px;
+    align-items: center;
+    border-bottom: 2px solid black;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    height: 60px;
+}
+
+.btn {
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid black;
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: auto repeat(6, 1fr);
+    flex-grow: 1;
+    gap: 2px;
+    border: 1px solid black;
+}
+
+.day-name {
+    font-weight: bold;
+    text-align: center;
+    padding: 10px 0;
+    border-bottom: 1px solid black;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day-cell {
+    text-align: center;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.day-cell.today {
+    background: black;
+    color: white;
+    font-weight: bold;
+}
+
+.day-cell.empty {
+    background: transparent;
+}
+
+/* Weekend Shading */
+.weekend {
+    background-color: var(--holiday-bg);
+}
+
+.weekend.today {
+    background: black;
+    color: white;
+}

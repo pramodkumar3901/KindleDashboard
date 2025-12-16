@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Kindle Calendar</title>
+    <link rel="stylesheet" href="css/calendar.css">
+</head>
+
+<body>
+    <div id="rotator">
+        <div class="main-container">
+            <header class="header">
+                <div class="btn" id="backBtn" onclick="window.location.href='kindle.html'">←</div>
+                <div class="btn" id="prevBtn">&lt;</div>
+                <div class="title" id="monthYear">Month Year</div>
+                <div class="btn" id="nextBtn">&gt;</div>
+            </header>
+
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Header Row -->
+                <div class="day-name weekend">Sun</div>
+                <div class="day-name">Mon</div>
+                <div class="day-name">Tue</div>
+                <div class="day-name">Wed</div>
+                <div class="day-name">Thu</div>
+                <div class="day-name">Fri</div>
+                <div class="day-name weekend">Sat</div>
+
+                <!-- Days will be injected here -->
+            </div>
+        </div>
+    </div>
+    <script src="js/calendar.js"></script>
+</body>
+
+</html>

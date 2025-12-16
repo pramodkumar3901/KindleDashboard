@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Kindle Clock</title>
+    <link rel="stylesheet" href="css/clock.css">
+</head>
+
+<body>
+    <div id="rotator">
+        <div class="main-container">
+            <div id="backBtn" class="corner-decoration top-left-arrow" onclick="window.location.href='kindle.html'">←
+            </div>
+
+            <svg class="analog-clock" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="48" class="clock-face" />
+
+                <!-- Marks -->
+                <line x1="50" y1="2" x2="50" y2="10" stroke="black" stroke-width="3" /> <!-- 12 -->
+                <line x1="98" y1="50" x2="90" y2="50" stroke="black" stroke-width="3" /> <!-- 3 -->
+                <line x1="50" y1="98" x2="50" y2="90" stroke="black" stroke-width="3" /> <!-- 6 -->
+                <line x1="2" y1="50" x2="10" y2="50" stroke="black" stroke-width="3" /> <!-- 9 -->
+
+                <!-- Hands -->
+                <line id="hour" x1="50" y1="50" x2="50" y2="25" class="hand hour-hand" />
+                <line id="minute" x1="50" y1="50" x2="50" y2="15" class="hand minute-hand" />
+
+                <circle cx="50" cy="50" r="3" class="center-dot" />
+            </svg>
+
+            <div id="digital" class="digital-clock">00:00:00 AM</div>
+            <div id="date" class="date-display">Loading...</div>
+        </div>
+    </div>
+    <script src="js/clock.js"></script>
+</body>
+
+</html>
