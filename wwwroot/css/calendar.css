@@ -37,21 +37,24 @@ body {
     flex-direction: column;
     box-sizing: border-box;
     padding: 10px;
+    position: relative;
 }
 
 /* Header with Back, Prev, Title, Next */
 .header {
     display: grid;
-    grid-template-columns: 50px 50px 1fr 50px;
+    grid-template-columns: 50px 50px 1fr 50px 50px;
+    /* Added column for List toggle */
     align-items: center;
     border-bottom: 2px solid black;
     padding-bottom: 10px;
     margin-bottom: 10px;
     height: 60px;
+    gap: 8px;
 }
 
 .btn {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     cursor: pointer;
     background: transparent;
@@ -98,6 +101,9 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 4px;
+    position: relative;
+    /* For overlays/markers */
+    cursor: pointer;
 }
 
 .day-cell.today {
@@ -118,4 +124,178 @@ body {
 .weekend.today {
     background: black;
     color: white;
+}
+
+/* --- Event Patterns --- */
+
+/* 1. Holiday: Circle Border */
+.evt-holiday::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    border: 2px solid black;
+    border-radius: 50%;
+}
+
+/* 2. Leave: Diagonal Stripes (Darker) */
+.evt-leave {
+    background: repeating-linear-gradient(45deg,
+            rgba(0, 0, 0, 0.3),
+            rgba(0, 0, 0, 0.3) 5px,
+            transparent 5px,
+            transparent 10px);
+}
+
+/* 3. Birthday: Solid Square Border (Similar to circle but square and smaller) */
+.evt-birthday {
+    background: transparent;
+    color: var(--fg);
+    border-radius: 0;
+}
+
+.evt-birthday::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 70%;
+    border: 3px solid black;
+    border-radius: 4px;
+}
+
+/* 4. Meeting: Dotted Border */
+.evt-meeting {
+    border: 2px dotted black;
+}
+
+/* 5. Reminder: Triangle Marker or Underline */
+.evt-reminder {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+}
+
+/* --- List View Container --- */
+.list-view {
+    /* display: none;  <-- Removed because parent wrapper handles toggling now */
+    display: block;
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.list-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    font-size: 1.2rem;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-date {
+    font-weight: bold;
+    display: inline-block;
+    width: 120px;
+}
+
+.list-name {}
+
+.list-type {
+    font-style: italic;
+    font-size: 0.9em;
+    float: right;
+}
+
+/* --- Detail Modal --- */
+#eventDetailPopup {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid black;
+    padding: 20px;
+    z-index: 100;
+    text-align: center;
+    width: 60%;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+#detailTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+}
+
+#detailDate {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+#detailType {
+    font-style: italic;
+}
+
+#closeDetailBtn {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: black;
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+/* --- Scroll Buttons --- */
+/* --- Scroll Buttons Side --- */
+.list-view-wrapper {
+    display: none;
+    /* Default hidden, toggled to flex by JS */
+    flex-grow: 1;
+    /* display: flex; <-- Removed duplicate */
+    flex-direction: row;
+    overflow: hidden;
+    gap: 10px;
+}
+
+.scroll-controls-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    width: 80px;
+    align-items: center;
+    border-left: 1px solid black;
+    padding-left: 10px;
+}
+
+.scroll-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+    font-weight: bold;
+    border: 2px solid black;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Hide scrollbar for list-view to rely on buttons, but keep functionality */
+.list-view::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
 }

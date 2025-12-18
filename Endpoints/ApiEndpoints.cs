@@ -68,6 +68,22 @@ public static class ApiEndpoints
             var goldPrice = await GetLatestGoldPriceAsync();
             return goldPrice;
         });
+
+        app.MapGet("/api/calendar/events", () =>
+        {
+            var csvPath = Path.Combine(Directory.GetCurrentDirectory(), "CalendarEvents.csv");
+            if (!File.Exists(csvPath)) return Results.Json(new List<object>());
+
+            var lines = File.ReadAllLines(csvPath).Skip(1); // Skip header
+            var events = lines.Select(line =>
+            {
+                var parts = line.Split(',');
+                if (parts.Length < 3) return null;
+                return new { date = parts[0], name = parts[1], type = parts[2] };
+            }).Where(x => x != null).ToList();
+
+            return Results.Json(events);
+        });
     }
 
     private static async Task<IResult> GetLatestGoldPriceAsync()
